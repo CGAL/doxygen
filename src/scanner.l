@@ -1346,6 +1346,10 @@ OPERATOR  "operator"{B}*({ARITHOP}|{ASSIGNOP}|{LOGICOP}|{BITOP})
 					  current->explicitExternal = TRUE;
 					  lineCount();
   					}
+<FindMembers>{B}*"const"{BN}+    	{ current->type += " const ";
+					  if (insideCS) current->stat = TRUE;
+					  lineCount();
+					}
 <FindMembers>{B}*"virtual"{BN}+    	{ current->type += " virtual ";
 					  current->virt = Virtual;
 					  lineCount();
