@@ -2667,7 +2667,7 @@ bool MemberDefImpl::hasDetailedDescription() const
   if (!m_hasDetailedDescriptionCached)
   {
     bool extractAll            = Config_getBool(EXTRACT_ALL);
-    bool xAllNoDetailedSec     = Config_getBool(EXTRACT_ALL_NO_DETAILED_IF_EMPTY);
+    bool xAllNoDetailedSec     = Config_getBool(NO_ADDITIONAL_DETAILS);
     bool alwaysDetailedSec     = Config_getBool(ALWAYS_DETAILED_SEC);
     bool repeatBrief           = Config_getBool(REPEAT_BRIEF);
     bool briefMemberDesc       = Config_getBool(BRIEF_MEMBER_DESC);
