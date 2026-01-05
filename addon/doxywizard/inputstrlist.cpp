@@ -1,12 +1,10 @@
 /******************************************************************************
  *
- * 
- *
- * Copyright (C) 1997-2013 by Dimitri van Heesch.
+ * Copyright (C) 1997-2019 by Dimitri van Heesch.
  *
  * Permission to use, copy, modify, and distribute this software and its
- * documentation under the terms of the GNU General Public License is hereby 
- * granted. No representations are made about the suitability of this software 
+ * documentation under the terms of the GNU General Public License is hereby
+ * granted. No representations are made about the suitability of this software
  * for any purpose. It is provided "as is" without express or implied warranty.
  * See the GNU General Public License for more details.
  *
@@ -17,10 +15,16 @@
 #include "doxywizard.h"
 #include "config.h"
 
-#include <QtGui>
+#include <QToolBar>
+#include <QGridLayout>
+#include <QLineEdit>
+#include <QListWidget>
+#include <QFileInfo>
+#include <QFileDialog>
+#include <QTextStream>
 
 InputStrList::InputStrList( QGridLayout *layout,int &row,
-                            const QString & id, 
+                            const QString & id,
                             const QStringList &sl, ListMode lm,
                             const QString & docs)
   : m_default(sl), m_strList(sl), m_docs(docs), m_id(id)
@@ -32,33 +36,33 @@ InputStrList::InputStrList( QGridLayout *layout,int &row,
 
   QToolBar *toolBar = new QToolBar;
   toolBar->setIconSize(QSize(24,24));
-  m_add = toolBar->addAction(QIcon(QString::fromAscii(":/images/add.png")),QString(),
+  m_add = toolBar->addAction(QIcon(QString::fromLatin1(":/images/add.svg")),QString(),
                              this,SLOT(addString()));
   m_add->setToolTip(tr("Add item"));
-  m_del = toolBar->addAction(QIcon(QString::fromAscii(":/images/del.png")),QString(),
+  m_del = toolBar->addAction(QIcon(QString::fromLatin1(":/images/del.svg")),QString(),
                              this,SLOT(delString()));
   m_del->setToolTip(tr("Delete selected item"));
-  m_upd = toolBar->addAction(QIcon(QString::fromAscii(":/images/refresh.png")),QString(),
+  m_upd = toolBar->addAction(QIcon(QString::fromLatin1(":/images/refresh.svg")),QString(),
                              this,SLOT(updateString()));
   m_upd->setToolTip(tr("Update selected item"));
 
   m_lb  = new QListWidget;
   //m_lb->setMinimumSize(400,100);
   foreach (QString s, m_strList) m_lb->addItem(s);
-  
-  m_brFile=0;
-  m_brDir=0;
+
+  m_brFile=nullptr;
+  m_brDir=nullptr;
   if (lm!=ListString)
   {
     if (lm&ListFile)
     {
-      m_brFile = toolBar->addAction(QIcon(QString::fromAscii(":/images/file.png")),QString(),
+      m_brFile = toolBar->addAction(QIcon(QString::fromLatin1(":/images/file.svg")),QString(),
                                     this,SLOT(browseFiles()));
       m_brFile->setToolTip(tr("Browse to a file"));
-    } 
+    }
     if (lm&ListDir)
     {
-      m_brDir = toolBar->addAction(QIcon(QString::fromAscii(":/images/folder.png")),QString(),
+      m_brDir = toolBar->addAction(QIcon(QString::fromLatin1(":/images/folder.svg")),QString(),
                                    this,SLOT(browseDir()));
       m_brDir->setToolTip(tr("Browse to a folder"));
     }
@@ -73,9 +77,9 @@ InputStrList::InputStrList( QGridLayout *layout,int &row,
 
   m_value = m_strList;
 
-  connect(m_le,   SIGNAL(returnPressed()), 
+  connect(m_le,   SIGNAL(returnPressed()),
           this, SLOT(addString()) );
-  connect(m_lb,   SIGNAL(currentTextChanged(const QString &)), 
+  connect(m_lb,   SIGNAL(currentTextChanged(const QString &)),
           this, SLOT(selectText(const QString &)));
   connect( m_lab, SIGNAL(enter()), SLOT(help()) );
   connect( m_lab, SIGNAL(reset()), SLOT(reset()) );
@@ -147,9 +151,9 @@ void InputStrList::setEnabled(bool state)
 void InputStrList::browseFiles()
 {
   QString path = QFileInfo(MainWindow::instance().configFileName()).path();
-  QStringList fileNames = QFileDialog::getOpenFileNames();	
+  QStringList fileNames = QFileDialog::getOpenFileNames();
 
-  if (!fileNames.isEmpty()) 
+  if (!fileNames.isEmpty())
   {
     QStringList::Iterator it;
     for ( it= fileNames.begin(); it != fileNames.end(); ++it )
@@ -175,11 +179,11 @@ void InputStrList::browseFiles()
 }
 
 void InputStrList::browseDir()
-{	
+{
   QString path = QFileInfo(MainWindow::instance().configFileName()).path();
-  QString dirName = QFileDialog::getExistingDirectory();	
+  QString dirName = QFileDialog::getExistingDirectory();
 
-  if (!dirName.isNull()) 
+  if (!dirName.isNull())
   {
     QDir dir(path);
     if (!MainWindow::instance().configFileName().isEmpty() && dir.exists())
@@ -188,7 +192,7 @@ void InputStrList::browseDir()
     }
     if (dirName.isEmpty())
     {
-      dirName=QString::fromAscii(".");
+      dirName=QString::fromLatin1(".");
     }
     m_lb->addItem(dirName);
     m_strList.append(dirName);
@@ -223,13 +227,13 @@ void InputStrList::update()
 
 void InputStrList::updateDefault()
 {
-  if (m_strList==m_default || !m_lab->isEnabled())
+  if (isDefault() || !m_lab->isEnabled())
   {
-    m_lab->setText(QString::fromAscii("<qt>")+m_id+QString::fromAscii("</qt"));
+    m_lab->setText(QString::fromLatin1("<qt>")+m_id+QString::fromLatin1("</qt>"));
   }
   else
   {
-    m_lab->setText(QString::fromAscii("<qt><font color='red'>")+m_id+QString::fromAscii("</font></qt>"));
+    m_lab->setText(QString::fromLatin1("<qt><font color='red'>")+m_id+QString::fromLatin1("</font></qt>"));
   }
 }
 
@@ -238,18 +242,79 @@ void InputStrList::reset()
   setValue(m_default);
 }
 
-void InputStrList::writeValue(QTextStream &t,QTextCodec *codec)
+void InputStrList::writeValue(QTextStream &t,TextCodecAdapter *codec,bool convert)
 {
-  bool first=TRUE;
-  foreach (QString s, m_strList) 
+  bool first=true;
+  foreach (QString s, m_strList)
   {
-    if (!first) 
+    if (!first)
     {
-      t << " \\" << endl;
+      t << " \\\n";
       t << "                         ";
     }
-    first=FALSE;
-    writeStringValue(t,codec,s);
+    first=false;
+    writeStringValue(t,codec,s,convert);
   }
 }
 
+bool InputStrList::isDefault()
+{
+  if (m_strList==m_default) return true;
+
+  auto it1 = m_strList.begin();
+  auto it2 = m_default.begin();
+  while (it1!=m_strList.end() && (*it1).isEmpty())
+  {
+    ++it1;
+  }
+  while (it2!=m_default.end() && (*it2).isEmpty())
+  {
+    ++it2;
+  }
+  // both lists are empty
+  if (it1==m_strList.end() && it2==m_default.end()) return true;
+
+  // one list is empty but the other is not
+  if (it1==m_strList.end()) return false;
+  if (it2==m_default.end()) return false;
+
+  it1 = m_strList.begin();
+  it2 = m_default.begin();
+  while (it1!=m_strList.end() && it2!=m_default.end())
+  {
+    // skip over empty values
+    while (it1!=m_strList.end() && (*it1).isEmpty())
+    {
+      ++it1;
+    }
+    while (it2!=m_default.end() && (*it2).isEmpty())
+    {
+      ++it2;
+    }
+    if ((it1!=m_strList.end()) && (it2!=m_default.end()))
+    {
+      if ((*it1).trimmed()!= (*it2).trimmed()) // difference so not the default
+      {
+        return false;
+      }
+      ++it1;
+      ++it2;
+    }
+    else if ((it1!=m_strList.end()) || (it2!=m_default.end()))
+    {
+      // one list empty so cannot be the default
+      return false;
+    }
+  }
+
+  return true;
+}
+
+bool InputStrList::isEmpty()
+{
+  foreach (QString s, m_strList)
+  {
+    if (!s.isEmpty()) return false;
+  }
+  return true;
+}

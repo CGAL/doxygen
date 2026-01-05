@@ -3,7 +3,7 @@
  * 
  *
  *
- * Copyright (C) 1997-2013 by Dimitri van Heesch.
+ * Copyright (C) 1997-2015 by Dimitri van Heesch.
  *
  * Permission to use, copy, modify, and distribute this software and its
  * documentation under the terms of the GNU General Public License is hereby 
@@ -21,6 +21,8 @@
 
 class Entry;
 
-void parseTagFile(Entry *root,const char *fullPathName);
+#include <memory>
+
+void parseTagFile(const std::shared_ptr<Entry> &root,const char *fullPathName);
 
 #endif

@@ -2,18 +2,18 @@
 #define CONDPARSER_H
 
 /**
- * Copyright (C) 1997-2013 by Dimitri van Heesch.
+ * Copyright (C) 1997-2015 by Dimitri van Heesch.
  *
  * Permission to use, copy, modify, and distribute this software and its
- * documentation under the terms of the GNU General Public License is hereby 
- * granted. No representations are made about the suitability of this software 
+ * documentation under the terms of the GNU General Public License is hereby
+ * granted. No representations are made about the suitability of this software
  * for any purpose. It is provided "as is" without express or implied warranty.
  * See the GNU General Public License for more details.
  *
  * Documents produced by Doxygen are derivative works derived from the
  * input used in their production; they are not affected by this license.
  *
- * C++ Expression parser for EXTABLED_SETIONS in Doxygen
+ * C++ Expression parser for ENABLED_SECTIONS in Doxygen
  *
  * Features used:
  *     Operators:
@@ -22,30 +22,31 @@
  *         !     NOT operator
  */
 
-#include <qcstring.h>
+#include "qcstring.h"
 
 class CondParser
 {
   // public functions
   public:
-    bool parse(const char *fileName,int lineNr,const char *expr);
+    CondParser() : m_e(nullptr), m_tokenType(NOTHING) {}
+    bool parse(const QCString &fileName,int lineNr,const QCString &expr);
 
     // enumerations
   private:
-    enum TOKENTYPE 
+    enum TOKENTYPE
     {
-      NOTHING = -1, 
-      DELIMITER, 
-      VARIABLE, 
+      NOTHING = -1,
+      DELIMITER,
+      VARIABLE,
       UNKNOWN
     };
-    enum OPERATOR_ID 
+    enum OPERATOR_ID
     {
-      UNKNOWN_OP = -1, 
-      AND = 1, 
-      OR, 
+      UNKNOWN_OP = -1,
+      AND = 1,
+      OR,
       NOT
-    }; 
+    };
 
     // data
   private:
@@ -67,7 +68,7 @@ class CondParser
     bool parseVar();
 
     bool evalOperator(const int opId, bool lhs, bool rhs);
-    bool evalVariable(const char *varName);
+    bool evalVariable(const QCString &varName);
     int getOperatorId(const QCString &opName);
 };
 

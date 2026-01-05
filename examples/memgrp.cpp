@@ -1,12 +1,12 @@
 /** A class. Details */
-class Test
+class Memgrp_Test
 {
   public:
-    //@{
+    ///@{
     /** Same documentation for both members. Details */
     void func1InGroup1();
     void func2InGroup1();
-    //@}
+    ///@}
 
     /** Function without group. Details. */
     void ungroupedFunction();
@@ -15,17 +15,17 @@ class Test
     void func2InGroup2();
 };
 
-void Test::func1InGroup1() {}
-void Test::func2InGroup1() {}
+void Memgrp_Test::func1InGroup1() {}
+void Memgrp_Test::func2InGroup1() {}
 
 /** @name Group2
  *  Description of group 2. 
  */
 ///@{
 /** Function 2 in group 2. Details. */
-void Test::func2InGroup2() {}
+void Memgrp_Test::func2InGroup2() {}
 /** Function 1 in group 2. Details. */
-void Test::func1InGroup2() {}
+void Memgrp_Test::func1InGroup2() {}
 ///@}
 
 /*! \file 

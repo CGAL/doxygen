@@ -2,7 +2,7 @@
  *
  *
  *
- * Copyright (C) 1997-2013 by Dimitri van Heesch.
+ * Copyright (C) 1997-2015 by Dimitri van Heesch.
  *
  * Permission to use, copy, modify, and distribute this software and its
  * documentation under the terms of the GNU General Public License is hereby
@@ -31,28 +31,36 @@
 class TranslatorKoreanEn : public TranslatorEnglish
 {
   public:
-    virtual QCString idLanguage()
+    QCString idLanguage() override
     { return "korean-en"; }
-    virtual QCString latexLanguageSupportCommand()
-      {
-	return "\\usepackage{hfont}\n";
-      }
-    /*! returns the name of the package that is included by LaTeX */
-    virtual QCString idLanguageCharset()
+    QCString latexLanguageSupportCommand() override
     {
-		return "euc-kr";
+      return "\\usepackage{kotex}\n";
     }
-    virtual QCString trRTFansicp()
+    QCString trRTFansicp() override
     {
       return "949";
+    }
+    QCString latexCommandName() override
+    {
+      return p_latexCommandName("xelatex");
     }
 
     /*! Used as ansicpg for RTF fcharset
      *  \see trRTFansicp() for a table of possible values.
      */
-    virtual QCString trRTFCharSet()
+    QCString trRTFCharSet() override
     {
       return "129";
+    }
+
+    QCString trISOLang() override
+    {
+      return "ko";
+    }
+    QCString getLanguageString() override
+    {
+      return "0x412 Korean";
     }
 };
 

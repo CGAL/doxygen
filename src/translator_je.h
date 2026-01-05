@@ -2,7 +2,7 @@
  *
  *
  *
- * Copyright (C) 1997-2013 by Dimitri van Heesch.
+ * Copyright (C) 1997-2015 by Dimitri van Heesch.
  *
  * Permission to use, copy, modify, and distribute this software and its
  * documentation under the terms of the GNU General Public License is hereby
@@ -32,25 +32,25 @@
 class TranslatorJapaneseEn : public TranslatorEnglish
 {
   public:
-    virtual QCString idLanguage()
+    QCString idLanguage() override
     { return "japanese-en"; }
-    virtual QCString latexLanguageSupportCommand()
-      {
-	return "platex";
-      }
-    /*! returns the name of the package that is included by LaTeX */
-    virtual QCString idLanguageCharset()
+    QCString latexLanguageSupportCommand() override
     {
-      //if (Config_getBool("USE_WINDOWS_ENCODING"))
-      //{
-      //  return "Shift_JIS";
-      //}
-      //else
-      //{
-        return "euc-jp";
-      //}
+      return "\\usepackage{CJKutf8}\n";
     }
-    virtual QCString trRTFansicp()
+    QCString latexFontenc() override
+    {
+      return "";
+    }
+    QCString latexDocumentPre() override
+    {
+      return "\\begin{CJK}{UTF8}{min}\n";
+    }
+    QCString latexDocumentPost() override
+    {
+      return "\\end{CJK}\n";
+    }
+    QCString trRTFansicp() override
     {
       return "932";
     }
@@ -58,9 +58,18 @@ class TranslatorJapaneseEn : public TranslatorEnglish
     /*! Used as ansicpg for RTF fcharset
      *  \see trRTFansicp() for a table of possible values.
      */
-    virtual QCString trRTFCharSet()
+    QCString trRTFCharSet() override
     {
       return "128";
+    }
+
+    QCString trISOLang() override
+    {
+      return "ja";
+    }
+    QCString getLanguageString() override
+    {
+      return "0x411 Japanese";
     }
 };
 
