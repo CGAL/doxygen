@@ -2667,6 +2667,7 @@ bool MemberDefImpl::hasDetailedDescription() const
   if (!m_hasDetailedDescriptionCached)
   {
     bool extractAll            = Config_getBool(EXTRACT_ALL);
+    bool xAllNoDetailedSec     = Config_getBool(EXTRACT_ALL_NO_DETAILED_IF_EMPTY);
     bool alwaysDetailedSec     = Config_getBool(ALWAYS_DETAILED_SEC);
     bool repeatBrief           = Config_getBool(REPEAT_BRIEF);
     bool briefMemberDesc       = Config_getBool(BRIEF_MEMBER_DESC);
@@ -2678,7 +2679,7 @@ bool MemberDefImpl::hasDetailedDescription() const
     // the member has detailed documentation because the user added some comments
     bool docFilter =
            // extract all is enabled
-           extractAll ||
+           (extractAll && !xAllNoDetailedSec)||
            // has detailed docs
            !documentation().isEmpty() ||
            // has inbody docs
